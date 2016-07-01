@@ -5,11 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const config = require('../config')
 const presets = require('../lib/utils/presets')
-const _config = require('config')
 const _debug = require('debug')
 
-const language = _config.get('language') || 'es5'
-const chunks = _config.get('chunks')
+const chunks = config.get('chunks')
 
 const debug = _debug('app:webpack:config')
 const paths = config.utils_paths
@@ -35,7 +33,7 @@ const webpackConfig = {
 const HOT_PATH = require.resolve('webpack-hot-middleware/client')
 const APP_ENTRY_PATHS = [paths.client('main.js')]
 
-isEsNext(language) && APP_ENTRY_PATHS.unshift(require.resolve('babel-polyfill'))
+config.isEsNext() && APP_ENTRY_PATHS.unshift(require.resolve('babel-polyfill'))
 
 webpackConfig.entry = Object.assign({
   app: __DEV__
@@ -129,23 +127,13 @@ webpackConfig.eslint = {
 // Loaders
 // ------------------------------------
 // JavaScript / JSON
-const presetList = ['react']
-
-if (isEsNext(language)) {
-  presetList.unshift('es2015')
-}
-
-if (/^stage-[0-3]$/.test(language)) {
-  presetList.push(language)
-}
-
 webpackConfig.module.loaders = [{
   test: /\.(js|jsx)$/,
   exclude: /node_modules/,
   loader: 'babel',
   query: {
     cacheDirectory: true,
-    presets: presets.apply(presets, presetList),
+    presets: config.presets(),
     env: {
       production: {
         presets: presets('react-optimize')
@@ -291,10 +279,6 @@ if (!__DEV__) {
       allChunks: true
     })
   )
-}
-
-function isEsNext (language) {
-  return ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3'].indexOf(language) !== -1
 }
 
 module.exports = webpackConfig

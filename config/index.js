@@ -1,8 +1,10 @@
 /* eslint key-spacing:0 spaced-comment:0 */
-var path = require('path')
-var _debug = require('debug')
-var { argv } = require('yargs')
-var ip = require('ip')
+const path = require('path')
+const _debug = require('debug')
+const { argv } = require('yargs')
+const ip = require('ip')
+const _config = require('config')
+const presets = require('../lib/utils/presets')
 
 const localip = ip.address()
 const debug = _debug('app:config')
@@ -97,6 +99,27 @@ config.utils_paths = {
   base: base,
   client: base.bind(null, config.dir_client),
   dist: base.bind(null, config.dir_dist)
+}
+
+config.get = _config.get.bind(_config)
+
+config.isEsNext = () => {
+  return ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3'].indexOf(_config.get('language')) !== -1
+}
+
+config.presets = () => {
+  const language = config.get('language')
+  const presetList = ['react']
+
+  if (config.isEsNext(language)) {
+    presetList.unshift('es2015')
+  }
+
+  if (/^stage-[0-3]$/.test(language)) {
+    presetList.push(language)
+  }
+
+  return presets.apply(presets, presetList)
 }
 
 // ========================================================
