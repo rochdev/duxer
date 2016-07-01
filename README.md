@@ -21,7 +21,7 @@ kit.
 * Lightweight Koa server
 * Hot module reloading
 
-## Coming soon
+#### Coming soon
 
 * Universal application support
 * Flow support
@@ -35,7 +35,7 @@ kit.
 
 The configuration is based on [node-config](https://github.com/lorenwest/node-config).
 
-### Options
+#### Options
 
 * `language`
 
@@ -50,7 +50,7 @@ The configuration is based on [node-config](https://github.com/lorenwest/node-co
   If one or more additional chunks are specified, any common dependencies will automatically be extracted to a `vendor`
   chunk.
 
-### Defaults
+#### Defaults
 
 ```json
 {
@@ -58,7 +58,7 @@ The configuration is based on [node-config](https://github.com/lorenwest/node-co
 }
 ```
 
-### Example
+#### Example
 
 ```json
 {
