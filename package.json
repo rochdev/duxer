@@ -10,6 +10,7 @@
     "duxer": "./bin/duxer",
     "duxer-build": "./bin/duxer-build",
     "duxer-server": "./bin/duxer-server",
+    "duxer-dev": "./bin/duxer-dev",
     "duxer-test": "./bin/duxer-test"
   },
   "repository": {
