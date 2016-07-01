@@ -54,7 +54,7 @@ The configuration is based on [node-config](https://github.com/lorenwest/node-co
 
 ```json
 {
-  "language": "es2015"
+  "language": "es5"
 }
 ```
 
