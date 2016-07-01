@@ -31,6 +31,23 @@ kit.
 * Code generation
 * Command-line interface
 
+## Usage
+
+#### Installation
+
+```bash
+npm install --save rochdev/duxer
+```
+
+#### Commands
+
+These are commands that you can use in any of your scripts in `package.json`:
+
+* `duxer start` start a server serving files in `dist`
+* `duxer dev` start a development server with hot module reloading
+* `duxer test` run unit tests
+* `duxer build` build the application and output to `dist`
+
 ## Configuration
 
 The configuration is based on [node-config](https://github.com/lorenwest/node-config).
