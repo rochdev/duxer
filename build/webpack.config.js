@@ -5,7 +5,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const config = require('../config');
 const presets = require('../lib/utils/presets');
+const _config = require('config');
 const _debug = require('debug');
+
+const language = _config.get('language') || 'es5';
+const chunks = _config.get('chunks');
 
 const debug = _debug('app:webpack:config');
 const paths = config.utils_paths;
@@ -29,17 +33,15 @@ const webpackConfig = {
 // Entry Points
 // ------------------------------------
 const HOT_PATH = require.resolve('webpack-hot-middleware/client');
-const APP_ENTRY_PATHS = [
-  require.resolve('babel-polyfill'),
-  paths.client('main.js')
-];
+const APP_ENTRY_PATHS = [paths.client('main.js')];
 
-webpackConfig.entry = {
+isEsNext(language) && APP_ENTRY_PATHS.unshift(require.resolve('babel-polyfill'));
+
+webpackConfig.entry = Object.assign({
   app: __DEV__
     ? APP_ENTRY_PATHS.concat(`${HOT_PATH}?path=${config.compiler_public_path}__webpack_hmr`)
-    : APP_ENTRY_PATHS,
-  vendor: config.compiler_vendor
-};
+    : APP_ENTRY_PATHS
+}, chunks);
 
 // ------------------------------------
 // Bundle Output
@@ -127,13 +129,23 @@ webpackConfig.eslint = {
 // Loaders
 // ------------------------------------
 // JavaScript / JSON
+const presetList = ['react'];
+
+if (isEsNext(language)) {
+  presetList.unshift('es2015');
+}
+
+if (/^stage-[0-3]$/.test(language)) {
+  presetList.push(language);
+}
+
 webpackConfig.module.loaders = [{
   test: /\.(js|jsx)$/,
   exclude: /node_modules/,
   loader: 'babel',
   query: {
     cacheDirectory: true,
-    presets: presets('es2015', 'react', 'stage-0'),
+    presets: presets.apply(presets, presetList),
     env: {
       production: {
         presets: presets('react-optimize')
@@ -281,6 +293,10 @@ if (!__DEV__) {
       allChunks: true
     })
   );
+}
+
+function isEsNext(language) {
+  return ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3'].indexOf(language) !== -1;
 }
 
 module.exports = webpackConfig;
