@@ -1,21 +1,21 @@
-const webpack = require('webpack');
-const cssnano = require('cssnano');
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const config = require('../config');
-const presets = require('../lib/utils/presets');
-const _config = require('config');
-const _debug = require('debug');
+const webpack = require('webpack')
+const cssnano = require('cssnano')
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const config = require('../config')
+const presets = require('../lib/utils/presets')
+const _config = require('config')
+const _debug = require('debug')
 
-const language = _config.get('language') || 'es5';
-const chunks = _config.get('chunks');
+const language = _config.get('language') || 'es5'
+const chunks = _config.get('chunks')
 
-const debug = _debug('app:webpack:config');
-const paths = config.utils_paths;
-const {__DEV__, __PROD__, __TEST__} = config.globals;
+const debug = _debug('app:webpack:config')
+const paths = config.utils_paths
+const {__DEV__, __PROD__, __TEST__} = config.globals
 
-debug('Create configuration.');
+debug('Create configuration.')
 const webpackConfig = {
   name: 'client',
   target: 'web',
@@ -28,20 +28,20 @@ const webpackConfig = {
     fallback: path.normalize(path.join(__dirname, '..', 'node_modules'))
   },
   module: {}
-};
+}
 // ------------------------------------
 // Entry Points
 // ------------------------------------
-const HOT_PATH = require.resolve('webpack-hot-middleware/client');
-const APP_ENTRY_PATHS = [paths.client('main.js')];
+const HOT_PATH = require.resolve('webpack-hot-middleware/client')
+const APP_ENTRY_PATHS = [paths.client('main.js')]
 
-isEsNext(language) && APP_ENTRY_PATHS.unshift(require.resolve('babel-polyfill'));
+isEsNext(language) && APP_ENTRY_PATHS.unshift(require.resolve('babel-polyfill'))
 
 webpackConfig.entry = Object.assign({
   app: __DEV__
     ? APP_ENTRY_PATHS.concat(`${HOT_PATH}?path=${config.compiler_public_path}__webpack_hmr`)
     : APP_ENTRY_PATHS
-}, chunks);
+}, chunks)
 
 // ------------------------------------
 // Bundle Output
@@ -50,7 +50,7 @@ webpackConfig.output = {
   filename: `[name].[${config.compiler_hash_type}].js`,
   path: paths.dist(),
   publicPath: config.compiler_public_path
-};
+}
 
 // ------------------------------------
 // Plugins
@@ -67,16 +67,16 @@ webpackConfig.plugins = [
       collapseWhitespace: true
     }
   })
-];
+]
 
 if (__DEV__) {
-  debug('Enable plugins for live development (HMR, NoErrors).');
+  debug('Enable plugins for live development (HMR, NoErrors).')
   webpackConfig.plugins.push(
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
-  );
+  )
 } else if (__PROD__) {
-  debug('Enable plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
+  debug('Enable plugins for production (OccurenceOrder, Dedupe & UglifyJS).')
   webpackConfig.plugins.push(
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
@@ -87,7 +87,7 @@ if (__DEV__) {
         warnings: false
       }
     })
-  );
+  )
 }
 
 // Don't split bundles during testing, since we only want import one bundle
@@ -96,7 +96,7 @@ if (!__TEST__) {
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor']
     })
-  );
+  )
 }
 
 // ------------------------------------
@@ -129,14 +129,14 @@ webpackConfig.eslint = {
 // Loaders
 // ------------------------------------
 // JavaScript / JSON
-const presetList = ['react'];
+const presetList = ['react']
 
 if (isEsNext(language)) {
-  presetList.unshift('es2015');
+  presetList.unshift('es2015')
 }
 
 if (/^stage-[0-3]$/.test(language)) {
-  presetList.push(language);
+  presetList.push(language)
 }
 
 webpackConfig.module.loaders = [{
@@ -152,34 +152,33 @@ webpackConfig.module.loaders = [{
       }
     }
   }
-},
-{
+}, {
   test: /\.json$/,
   loader: 'json'
-}];
+}]
 
 // ------------------------------------
 // Style Loaders
 // ------------------------------------
 // We use cssnano with the postcss loader, so we tell
 // css-loader not to duplicate minimization.
-const BASE_CSS_LOADER = 'css?sourceMap&-minimize';
+const BASE_CSS_LOADER = 'css?sourceMap&-minimize'
 
 // Add any packge names here whose styles need to be treated as CSS modules.
 // These paths will be combined into a single regex.
 const PATHS_TO_TREAT_AS_CSS_MODULES = [
   // 'react-toolbox', (example)
-];
+]
 
 // If config has CSS modules enabled, treat this project's styles as CSS modules.
 if (config.compiler_css_modules) {
   PATHS_TO_TREAT_AS_CSS_MODULES.push(
     paths.client().replace(/[\^\$\.\*\+\-\?\=\!\:\|\\\/\(\)\[\]\{\}\,]/g, '\\$&') // eslint-disable-line
-  );
+  )
 }
 
-const isUsingCSSModules = !!PATHS_TO_TREAT_AS_CSS_MODULES.length;
-const cssModulesRegex = new RegExp(`(${PATHS_TO_TREAT_AS_CSS_MODULES.join('|')})`);
+const isUsingCSSModules = !!PATHS_TO_TREAT_AS_CSS_MODULES.length
+const cssModulesRegex = new RegExp(`(${PATHS_TO_TREAT_AS_CSS_MODULES.join('|')})`)
 
 // Loaders for styles that need to be treated as CSS modules.
 if (isUsingCSSModules) {
@@ -188,7 +187,7 @@ if (isUsingCSSModules) {
     'modules',
     'importLoaders=1',
     'localIdentName=[name]__[local]___[hash:base64:5]'
-  ].join('&');
+  ].join('&')
 
   webpackConfig.module.loaders.push({
     test: /\.scss$/,
@@ -199,7 +198,7 @@ if (isUsingCSSModules) {
       'postcss',
       'sass?sourceMap'
     ]
-  });
+  })
 
   webpackConfig.module.loaders.push({
     test: /\.css$/,
@@ -209,11 +208,11 @@ if (isUsingCSSModules) {
       cssModulesLoader,
       'postcss'
     ]
-  });
+  })
 }
 
 // Loaders for files that should not be treated as CSS modules.
-const excludeCSSModules = isUsingCSSModules ? cssModulesRegex : false;
+const excludeCSSModules = isUsingCSSModules ? cssModulesRegex : false
 webpackConfig.module.loaders.push({
   test: /\.scss$/,
   exclude: excludeCSSModules,
@@ -223,7 +222,7 @@ webpackConfig.module.loaders.push({
     'postcss',
     'sass?sourceMap'
   ]
-});
+})
 webpackConfig.module.loaders.push({
   test: /\.css$/,
   exclude: excludeCSSModules,
@@ -232,14 +231,14 @@ webpackConfig.module.loaders.push({
     BASE_CSS_LOADER,
     'postcss'
   ]
-});
+})
 
 // ------------------------------------
 // Style Configuration
 // ------------------------------------
 webpackConfig.sassLoader = {
   includePaths: paths.client('styles')
-};
+}
 
 webpackConfig.postcss = [
   cssnano({
@@ -257,7 +256,7 @@ webpackConfig.postcss = [
     safe: true,
     sourcemap: true
   })
-];
+]
 
 // File loaders
 /* eslint-disable */
@@ -279,24 +278,23 @@ webpackConfig.module.loaders.push(
 // need to use the extractTextPlugin to fix this issue:
 // http://stackoverflow.com/questions/34133808/webpack-ots-parsing-error-loading-fonts/34133809#34133809
 if (!__DEV__) {
-  debug('Apply ExtractTextPlugin to CSS loaders.');
-  webpackConfig.module.loaders.filter((loader) =>
-    loader.loaders && loader.loaders.find((name) => /css/.test(name.split('?')[0]))
+  debug('Apply ExtractTextPlugin to CSS loaders.')
+  webpackConfig.module.loaders.filter((loader) => loader.loaders && loader.loaders.find((name) => /css/.test(name.split('?')[0]))
   ).forEach((loader) => {
-    const [first, ...rest] = loader.loaders;
-    loader.loader = ExtractTextPlugin.extract(first, rest.join('!'));
-    delete loader.loaders;
-  });
+    const [first, ...rest] = loader.loaders
+    loader.loader = ExtractTextPlugin.extract(first, rest.join('!'))
+    delete loader.loaders
+  })
 
   webpackConfig.plugins.push(
     new ExtractTextPlugin('[name].[contenthash].css', {
       allChunks: true
     })
-  );
+  )
 }
 
-function isEsNext(language) {
-  return ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3'].indexOf(language) !== -1;
+function isEsNext (language) {
+  return ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3'].indexOf(language) !== -1
 }
 
-module.exports = webpackConfig;
+module.exports = webpackConfig
