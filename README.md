@@ -1,5 +1,7 @@
 # Duxer
 
+[![Dependency Status](https://gemnasium.com/badges/github.com/rochdev/duxer.svg)](https://gemnasium.com/github.com/rochdev/duxer)
+
 The missing react/redux framework.
 
 The goal of this project is to provide a framework for building, testing and bootstrapping React/Redux applications so
