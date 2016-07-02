@@ -101,7 +101,13 @@ config.utils_paths = {
   dist: base.bind(null, config.dir_dist)
 }
 
-config.get = _config.get.bind(_config)
+config.get = (key, fallback) => {
+  if (!fallback || _config.has(key)) {
+    return _config.get(key)
+  }
+
+  return fallback
+}
 
 config.isEsNext = () => {
   return ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3'].indexOf(_config.get('language')) !== -1
